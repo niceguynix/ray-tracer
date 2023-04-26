@@ -1,4 +1,5 @@
 mod types;
+
 use types::{color::Color, ray::Ray, vector::Point3, vector::Vec3};
 
 //Image dimensions
@@ -43,7 +44,7 @@ fn main() {
     println!("{} {}", IMAGE_WIDTH, IMAGE_HEIGHT);
     println!("255");
 
-    eprintln!("{} {} {}", IMAGE_HEIGHT, IMAGE_WIDTH, ASPECT_RATIO as u32);
+    eprintln!("{} {} {}", IMAGE_HEIGHT, IMAGE_WIDTH, ASPECT_RATIO);
 
     for j in (0..IMAGE_HEIGHT).rev() {
         for i in 0..IMAGE_WIDTH {
@@ -65,19 +66,27 @@ fn main() {
 }
 
 fn ray_color(ray: &Ray) -> Color {
-    if intersect_sphere(&Point3::new(0.0, 0.0, -1.0), 0.5, ray) {
-        return Color::new(1.0, 0.0, 0.0);
+    
+    let int_sph= intersect_sphere(&Point3::new(0.0, 0.0, -1.0), 0.5, ray);
+    if (int_sph!=-1.0){
+        let t = ray.at(int_sph)- Vec3::new(0.0,0.0,-1.0);
+        let int_pt=t.normal();
+        return 0.5 * Color::new(int_pt.x+1.0,int_pt.y+1.0,int_pt.z+1.0)
     }
     let unit_direction = ray.dir.normal();
     let t = 0.5 * (unit_direction.y + 1.0);
-    (1.0 - t) * Color::new(1.0, 1.0, 1.0) + t * Color::new(0.5, 0.7, 1.0)
+    (1.0 - t) * Color::new(0.0, 0.0, 0.0) + t * Color::new(0.5, 0.7, 1.0)
 }
 
-fn intersect_sphere(center: &Point3, radius: f32, ray: &Ray) -> bool {
+fn intersect_sphere(center: &Point3, radius: f32, ray: &Ray) -> f32 {
     let oc = ray.orig - *center;
     let a = ray.dir.dot(&ray.dir);
     let b = 2.0 * oc.dot(&ray.dir);
     let c = oc.dot(&oc) - radius * radius;
     let discriminant = b * b - 4.0 * a * c;
-    return discriminant > 0.0;
+    if discriminant<0.0 {
+        return -1.0
+    }else{
+        return (-b-f32::sqrt(discriminant))/(2.0*a)
+    }
 }
