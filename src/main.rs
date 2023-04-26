@@ -66,12 +66,11 @@ fn main() {
 }
 
 fn ray_color(ray: &Ray) -> Color {
-    
-    let int_sph= intersect_sphere(&Point3::new(0.0, 0.0, -1.0), 0.5, ray);
-    if (int_sph!=-1.0){
-        let t = ray.at(int_sph)- Vec3::new(0.0,0.0,-1.0);
-        let int_pt=t.normal();
-        return 0.5 * Color::new(int_pt.x+1.0,int_pt.y+1.0,int_pt.z+1.0)
+    let int_sph = intersect_sphere(&Point3::new(0.0, 0.0, -1.0), 0.5, ray);
+    if int_sph != -1.0 {
+        let t = ray.at(int_sph) - Vec3::new(0.0, 0.0, -1.0);
+        let int_pt = t.normal();
+        return 0.5 * Color::new(int_pt.x + 1.0, int_pt.y + 1.0, int_pt.z + 1.0);
     }
     let unit_direction = ray.dir.normal();
     let t = 0.5 * (unit_direction.y + 1.0);
@@ -84,9 +83,9 @@ fn intersect_sphere(center: &Point3, radius: f32, ray: &Ray) -> f32 {
     let b = 2.0 * oc.dot(&ray.dir);
     let c = oc.dot(&oc) - radius * radius;
     let discriminant = b * b - 4.0 * a * c;
-    if discriminant<0.0 {
-        return -1.0
-    }else{
-        return (-b-f32::sqrt(discriminant))/(2.0*a)
+    if discriminant < 0.0 {
+        return -1.0;
+    } else {
+        return (-b - f32::sqrt(discriminant)) / (2.0 * a);
     }
 }
