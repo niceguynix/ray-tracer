@@ -1,12 +1,18 @@
 mod types;
 mod objects;
 
-use types::{color::Color, ray::Ray, vector::Point3, vector::Vec3};
+use std::rc::Rc;
+
+use types::{color::Color, ray::Ray, vector::Point3, vector::Vec3,hittable::{self, HitRecord},hittable_list::HittableList};
+
+use objects::sphere::Sphere;
+use crate::types::hittable::Hittable;
+use crate::types::rtweekend::INFINITY;
 
 //Image dimensions
 const ASPECT_RATIO: f32 = 16.0 / 9.0;
 
-const IMAGE_WIDTH: u32 = 400;
+const IMAGE_WIDTH: u32 = 500;
 const IMAGE_HEIGHT: u32 = (IMAGE_WIDTH as f32 / ASPECT_RATIO) as u32;
 
 //Camera dimensions
@@ -31,7 +37,21 @@ const VERTICAL: Vec3 = Vec3 {
     z: 0.0,
 };
 
+impl<T: Hittable + ?Sized> Hittable for &T {
+    fn hit(&self, r: &Ray, t_min: f32, t_max: f32,rec:&mut HitRecord) -> bool {
+        (*self).hit(r, t_min, t_max,rec)
+    }
+}
+
 fn main() {
+
+    // let mut world:HittableList<dyn Hittable>=HittableList::default();
+    let mut world = HittableList::default();
+    
+    world.add(Rc::new(Sphere{center:Point3{x:0.0,y:0.0,z:-1.0},radius:0.5}));
+    world.add(Rc::new(Sphere{center:Point3{x:1.0,y:-100.5,z:-1.0},radius:100.0}));
+    world.add(Rc::new(Sphere{center:Point3{x:1.0,y:0.0,z:-2.0},radius:0.5}));
+
     let lower_left_corner = ORIGIN
         - HORIZONTAL / 2.0
         - VERTICAL / 2.0
@@ -58,7 +78,7 @@ fn main() {
                 ORIGIN,
                 lower_left_corner + u * HORIZONTAL + v * VERTICAL - ORIGIN,
             );
-            let pixel_color = ray_color(&r);
+            let pixel_color = ray_color(&r,&world);
             types::color::write_color(&pixel_color);
         }
     }
@@ -66,13 +86,14 @@ fn main() {
     eprintln!("Rendered");
 }
 
-fn ray_color(ray: &Ray) -> Color {
-    let int_sph = intersect_sphere(&Point3::new(0.0, 0.0, -1.0), 0.5, ray);
-    if int_sph != -1.0 {
-        let t = ray.at(int_sph) - Vec3::new(0.0, 0.0, -1.0);
-        let int_pt = t.normal();
-        return 0.5 * Color::new(int_pt.x + 1.0, int_pt.y + 1.0, int_pt.z + 1.0);
+fn ray_color(ray: &Ray,world:&HittableList) -> Color {
+    let mut rec=HitRecord::default();
+    
+    if world.hit(&ray,0.0,INFINITY,&mut rec){
+        return 0.5*(rec.normal+Color::new(0.5,0.5,0.5));
     }
+    
+
     let unit_direction = ray.dir.normal();
     let t = 0.5 * (unit_direction.y + 1.0);
     // let t = 0.5 * (ray.dir.y+1.0);
@@ -81,18 +102,4 @@ fn ray_color(ray: &Ray) -> Color {
     // (1.0 - t) * Color::new(1.0, 1.0, 1.0) + t * Color::new(0.0, 0.0, 0.0)
     // Color::new(1.0,1.0,1.0)*t
 
-}
-
-fn intersect_sphere(center: &Point3, radius: f32, ray: &Ray) -> f32 {
-    let oc = ray.orig - *center;
-        let a = ray.dir.dot(&ray.dir);
-        let b = 2.0 * oc.dot(&ray.dir);
-        let c = oc.dot(&oc) - radius * radius;
-        let discriminant = b * b - 4.0 * a * c;
-        
-        if discriminant<0.0{
-            return -1.0;
-        }else{
-            return (-b-f32::sqrt(discriminant))/(2.0*a);
-        }
 }

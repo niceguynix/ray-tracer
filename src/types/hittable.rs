@@ -15,6 +15,12 @@ impl HitRecord{
     }
 }
 
+impl HitRecord{
+    pub fn default()->Self{
+        HitRecord { p: Vec3::default(), normal: Vec3::default(), t: 0.0, front_face: true }
+    }
+}
+
 pub trait Hittable{
-    fn hit(&self,r:Ray,t_min:f32,t_max:f32,rec:&mut HitRecord)->bool;
+    fn hit(&self,r:&Ray,t_min:f32,t_max:f32,rec:&mut HitRecord)->bool;
 }
