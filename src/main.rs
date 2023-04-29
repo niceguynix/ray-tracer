@@ -3,7 +3,7 @@ mod objects;
 
 use std::rc::Rc;
 
-use types::{color::Color, ray::Ray, vector::Point3, vector::Vec3,hittable::{self, HitRecord},hittable_list::HittableList};
+use types::{color::Color, ray::Ray, vector::Point3, vector::Vec3,hittable::{HitRecord},hittable_list::HittableList};
 
 use objects::sphere::Sphere;
 use crate::types::hittable::Hittable;
