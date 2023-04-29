@@ -1,4 +1,5 @@
 mod types;
+mod objects;
 
 use types::{color::Color, ray::Ray, vector::Point3, vector::Vec3};
 
@@ -84,13 +85,14 @@ fn ray_color(ray: &Ray) -> Color {
 
 fn intersect_sphere(center: &Point3, radius: f32, ray: &Ray) -> f32 {
     let oc = ray.orig - *center;
-    let a = ray.dir.dot(&ray.dir);
-    let b = 2.0 * oc.dot(&ray.dir);
-    let c = oc.dot(&oc) - radius * radius;
-    let discriminant = b * b - 4.0 * a * c;
-    if discriminant < 0.0 {
-        return -1.0;
-    } else {
-        return (-b - f32::sqrt(discriminant)) / (2.0 * a);
-    }
+        let a = ray.dir.dot(&ray.dir);
+        let b = 2.0 * oc.dot(&ray.dir);
+        let c = oc.dot(&oc) - radius * radius;
+        let discriminant = b * b - 4.0 * a * c;
+        
+        if discriminant<0.0{
+            return -1.0;
+        }else{
+            return (-b-f32::sqrt(discriminant))/(2.0*a);
+        }
 }
