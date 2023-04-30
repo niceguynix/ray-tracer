@@ -79,7 +79,7 @@ fn main() {
                 lower_left_corner + u * HORIZONTAL + v * VERTICAL - ORIGIN,
             );
             let pixel_color = ray_color(&r,&world);
-            types::color::write_color(&pixel_color);
+            types::color::write_color(&pixel_color,);
         }
     }
 
