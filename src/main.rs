@@ -12,7 +12,7 @@ use crate::types::rtweekend::INFINITY;
 //Image dimensions
 const ASPECT_RATIO: f32 = 16.0 / 9.0;
 
-const IMAGE_WIDTH: u32 = 500;
+const IMAGE_WIDTH: u32 = 1920;
 const IMAGE_HEIGHT: u32 = (IMAGE_WIDTH as f32 / ASPECT_RATIO) as u32;
 
 //Camera dimensions
