@@ -4,7 +4,7 @@ mod objects;
 use std::rc::Rc;
 
 use types::{color::Color, ray::Ray, vector::Point3, vector::Vec3,hittable::{HitRecord},hittable_list::HittableList};
-
+use rand::prelude::*;
 use objects::sphere::Sphere;
 use crate::types::{hittable::Hittable, camera::Camera};
 use crate::types::rtweekend::INFINITY;
@@ -12,7 +12,7 @@ use crate::types::rtweekend::INFINITY;
 const ASPECT_RATIO:f32 = 16.0 / 9.0;
 const IMAGE_WIDTH:u32 = 400;
 const IMAGE_HEIGHT:u32 = (IMAGE_WIDTH as f32 / ASPECT_RATIO) as u32;
-const SAMPLES_PER_PIXEL:u8 = 1;
+const SAMPLES_PER_PIXEL:u8 = 100;
 
 fn main() {
 
@@ -25,6 +25,8 @@ fn main() {
 
     let camera=Camera::new();
 
+    let mut rng = rand::thread_rng();
+
     println!("P3");
     println!("{} {}", IMAGE_WIDTH, IMAGE_HEIGHT);
     println!("255");
@@ -34,12 +36,15 @@ fn main() {
     for j in (0..IMAGE_HEIGHT).rev() {
         for i in 0..IMAGE_WIDTH {
             // eprintln!("\rScanlines remaining: {} ", j);
+            let mut pixel_color=Color::default();
+            for _s in 0..SAMPLES_PER_PIXEL{
             
-            let u = i as f32 / (IMAGE_WIDTH - 1) as f32;
-            let v = j as f32 / (IMAGE_HEIGHT - 1) as f32;
+                let u = (i as f32 + rng.gen::<f32>()) / (IMAGE_WIDTH - 1) as f32;
+                let v = (j as f32 + rng.gen::<f32>()) / (IMAGE_HEIGHT - 1) as f32;
 
-            let r = camera.get_ray(u, v);
-            let pixel_color = ray_color(&r,&world);
+                let r = camera.get_ray(u, v);
+                pixel_color += ray_color(&r,&world);
+            }
             types::color::write_color(&pixel_color,SAMPLES_PER_PIXEL);
         }
     }
