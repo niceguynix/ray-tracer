@@ -9,9 +9,9 @@ fn clamp(x:f32,min:f32,max:f32)->f32{
 
 pub fn write_color(color: &Color,samples_per_pixel:u8) {
 
-    let r = color.x;
-    let g = color.y;
-    let b = color.z;
+    let mut r = color.x;
+    let mut g = color.y;
+    let mut b = color.z;
 
     let scale = 1.0 / samples_per_pixel as f32;
     r *= scale;
