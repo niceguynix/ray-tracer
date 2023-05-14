@@ -14,14 +14,15 @@ pub fn write_color(color: &Color,samples_per_pixel:u8) {
     let mut b = color.z;
 
     let scale = 1.0 / samples_per_pixel as f32;
-    r *= scale;
-    g *= scale;
-    b *= scale;
+
+    r = f32::sqrt(r*scale);
+    g = f32::sqrt(g*scale);
+    b = f32::sqrt(b*scale);
 
     print!(
         "{} {} {}\n",
-        (256.0 * clamp(r, 0.0, 0.999)) as f32,
-        (256.0 * clamp(g, 0.0, 0.999)) as f32,
-        (256.0 * clamp(b, 0.0, 0.999)) as f32
+        (256.0 * clamp(r, 0.0, 0.999)) as i32,
+        (256.0 * clamp(g, 0.0, 0.999)) as i32,
+        (256.0 * clamp(b, 0.0, 0.999)) as i32
     );
 }

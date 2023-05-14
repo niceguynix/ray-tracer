@@ -1,5 +1,7 @@
 use std::ops;
 
+use rand::{Rng, distributions::Uniform, prelude::Distribution};
+
 #[derive(Clone, Copy)]
 pub struct Vec3 {
     pub x: f32,
@@ -83,7 +85,7 @@ impl Vec3 {
         f32::sqrt(self.length_squared())
     }
 
-    fn length_squared(&self) -> f32 {
+    pub fn length_squared(&self) -> f32 {
         self.x.powi(2) + self.y.powi(2) + self.z.powi(2)
     }
 }
@@ -168,6 +170,20 @@ impl Vec3 {
     pub fn normal(self) -> Self {
         let len = self.length();
         self / len
+    }
+
+    pub fn random()->Self{
+        let mut rng=rand::thread_rng();
+        return Vec3 { x: rng.gen_range(0.0..1.0), y: rng.gen_range(0.0..1.0), z: rng.gen_range(0.0..1.0) }
+    }
+
+    pub fn random_range(min:f32,max:f32)->Self{
+        let mut rng=rand::thread_rng();
+        let x=rng.gen_range(min..max);
+        let y=rng.gen_range(min..max);
+        let z=rng.gen_range(min..max);
+        
+        return Vec3 { x , y, z }
     }
 }
 

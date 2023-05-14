@@ -3,7 +3,7 @@ mod objects;
 
 use std::rc::Rc;
 
-use types::{color::Color, ray::Ray, vector::Point3, vector::Vec3,hittable::{HitRecord},hittable_list::HittableList};
+use types::{color::Color, ray::Ray, vector::Point3, vector::Vec3,hittable::{HitRecord},hittable_list::HittableList, rtweekend::{random_in_unit_sphere, random_in_hemisphere}};
 use rand::prelude::*;
 use objects::sphere::Sphere;
 use crate::types::{hittable::Hittable, camera::Camera};
@@ -13,6 +13,7 @@ const ASPECT_RATIO:f32 = 16.0 / 9.0;
 const IMAGE_WIDTH:u32 = 400;
 const IMAGE_HEIGHT:u32 = (IMAGE_WIDTH as f32 / ASPECT_RATIO) as u32;
 const SAMPLES_PER_PIXEL:u8 = 100;
+const MAX_DEPTH:i8=50;
 
 fn main() {
 
@@ -20,8 +21,8 @@ fn main() {
     let mut world = HittableList::default();
     
     world.add(Rc::new(Sphere{center:Point3{x:0.0,y:0.0,z:-1.0},radius:0.5}));
-    world.add(Rc::new(Sphere{center:Point3{x:1.0,y:-100.5,z:-1.0},radius:100.0}));
-    world.add(Rc::new(Sphere{center:Point3{x:1.0,y:0.0,z:-2.0},radius:0.5}));
+    world.add(Rc::new(Sphere{center:Point3{x:0.0,y:-100.5,z:-1.0},radius:100.0}));
+    // world.add(Rc::new(Sphere{center:Point3{x:1.0,y:0.0,z:-2.0},radius:0.5}));
 
     let camera=Camera::new();
 
@@ -43,7 +44,7 @@ fn main() {
                 let v = (j as f32 + rng.gen::<f32>()) / (IMAGE_HEIGHT - 1) as f32;
 
                 let r = camera.get_ray(u, v);
-                pixel_color += ray_color(&r,&world);
+                pixel_color += ray_color(&r,&world,MAX_DEPTH);
             }
             types::color::write_color(&pixel_color,SAMPLES_PER_PIXEL);
         }
@@ -52,19 +53,31 @@ fn main() {
     eprintln!("Rendered");
 }
 
-fn ray_color(ray: &Ray,world:&HittableList) -> Color {
+fn ray_color(ray: &Ray,world:&HittableList,depth:i8) -> Color {
     let mut rec=HitRecord::default();
     
-    if world.hit(&ray,0.0,INFINITY,&mut rec){
-        return 0.5*(rec.normal+Color::new(0.5,0.5,0.5));
+    if depth <= 0 {
+        return Color::default();
     }
+
+    if world.hit(&ray,0.001,INFINITY,&mut rec){
+        // let target = rec.p + rec.normal + random_in_unit_sphere();
+        let random=random_in_hemisphere(&rec.normal);
+        let target = rec.p +random;
+        let new_ray = Ray::new(rec.p,target-rec.p);
+        return  0.5* ray_color(&new_ray,world,depth-1);
+    }   
     
+    // if world.hit(&ray,0.0,INFINITY,&mut rec){
+    //     return 0.5 * (rec.normal + Color::new(1.0,1.0,1.0));
+    // }
 
     let unit_direction = ray.dir.normal();
     let t = 0.5 * (unit_direction.y + 1.0);
     // let t = 0.5 * (ray.dir.y+1.0);
     // eprintln!("{}",t);
-    (1.0 - t) * Color::new(0.0, 0.0, 0.0) + t * Color::new(0.5, 0.7, 1.0)
+    // (1.0 - t) * Color::new(0.0, 0.0, 0.0) + t * Color::new(0.5, 0.7, 1.0)
+    (1.0 - t) * Color::new(1.0, 1.0, 1.0) + t * Color::new(0.5, 0.7, 1.0)
     // (1.0 - t) * Color::new(1.0, 1.0, 1.0) + t * Color::new(0.0, 0.0, 0.0)
     // Color::new(1.0,1.0,1.0)*t
 
