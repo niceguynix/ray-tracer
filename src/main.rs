@@ -1,16 +1,17 @@
 mod types;
 mod objects;
+mod materials;
 
 use std::rc::Rc;
 
 use types::{color::Color, ray::Ray, vector::Point3, vector::Vec3,hittable::{HitRecord},hittable_list::HittableList, rtweekend::{random_in_unit_sphere, random_in_hemisphere}};
 use rand::prelude::*;
 use objects::sphere::Sphere;
-use crate::types::{hittable::Hittable, camera::Camera};
+use crate::{types::{hittable::Hittable, camera::Camera}, materials::{lambertian::Lambertian, metal::Metal}};
 use crate::types::rtweekend::INFINITY;
 
 const ASPECT_RATIO:f32 = 16.0 / 9.0;
-const IMAGE_WIDTH:u32 = 400;
+const IMAGE_WIDTH:u32 = 1920;
 const IMAGE_HEIGHT:u32 = (IMAGE_WIDTH as f32 / ASPECT_RATIO) as u32;
 const SAMPLES_PER_PIXEL:u8 = 100;
 const MAX_DEPTH:i8=50;
@@ -19,10 +20,25 @@ fn main() {
 
     // let mut world:HittableList<dyn Hittable>=HittableList::default();
     let mut world = HittableList::default();
-    
-    world.add(Rc::new(Sphere{center:Point3{x:0.0,y:0.0,z:-1.0},radius:0.5}));
-    world.add(Rc::new(Sphere{center:Point3{x:0.0,y:-100.5,z:-1.0},radius:100.0}));
+
+    let material_ground = Rc::new(Lambertian {albedo: Color::new(0.8,0.8,0.0)});
+    let material_center = Rc::new(Lambertian {albedo: Color::new(0.7,0.3,0.3)});
+    let material_left   = Rc::new(Metal {albedo:Color::new(0.8, 0.8, 0.8)});
+    let material_right  = Rc::new(Metal {albedo:Color::new(0.8, 0.6, 0.2)});
+
+    let copy = Rc::clone(&material_ground);
+
+    world.add(Rc::new(Sphere{center:Point3::new( 0.0, -100.5, -1.0),radius:100.0,mat_ptr:copy}));
+    world.add(Rc::new(Sphere{center:Point3::new( 0.0, 0.0, -1.0),radius:0.5,mat_ptr:material_center}));
+    world.add(Rc::new(Sphere{center:Point3::new(-1.0, 0.0, -1.0),radius:0.5,mat_ptr:material_left}));
+    world.add(Rc::new(Sphere{center:Point3::new( 1.0, 0.0, -1.0),radius:0.5,mat_ptr:material_right}));
+
     // world.add(Rc::new(Sphere{center:Point3{x:1.0,y:0.0,z:-2.0},radius:0.5}));
+
+    eprintln!("Start");
+    eprintln!("{} {} {}",material_ground.albedo.x,material_ground.albedo.y,material_ground.albedo.z);
+    eprintln!("Start");
+
 
     let camera=Camera::new();
 
@@ -62,10 +78,19 @@ fn ray_color(ray: &Ray,world:&HittableList,depth:i8) -> Color {
 
     if world.hit(&ray,0.001,INFINITY,&mut rec){
         // let target = rec.p + rec.normal + random_in_unit_sphere();
-        let random=random_in_hemisphere(&rec.normal);
-        let target = rec.p +random;
-        let new_ray = Ray::new(rec.p,target-rec.p);
-        return  0.5* ray_color(&new_ray,world,depth-1);
+        let mut scattered=Ray::new(Vec3::default(),Vec3::default());
+        let mut attenuation=Vec3::default();    
+        if rec.mat_ptr.scatter(ray,&rec,&mut attenuation,&mut scattered){
+            // eprintln!("{} {} {}",attenuation.x,attenuation.y,attenuation.z);
+            return attenuation * ray_color(&scattered, world, depth-1);
+        }
+
+        return Color::default();
+        
+        // let random=random_in_hemisphere(&rec.normal);
+        // let target = rec.p +random;
+        // let new_ray = Ray::new(rec.p,target-rec.p);
+        // return  0.5* ray_color(&new_ray,world,depth-1);
     }   
     
     // if world.hit(&ray,0.0,INFINITY,&mut rec){

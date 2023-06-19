@@ -185,6 +185,16 @@ impl Vec3 {
         
         return Vec3 { x , y, z }
     }
+
+    pub fn near_zero(&self)->bool{
+        let s=1e-8;
+        f32::abs(self.x) < s && f32::abs(self.y) < s && f32::abs(self.z) < s
+    }
+
+    pub fn reflect(v:&Vec3,n:&Vec3)->Vec3{
+        *v - 2.0*v.dot(n)* *n
+    }
+
 }
 
 pub type Point3 = Vec3;
