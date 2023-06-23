@@ -7,7 +7,7 @@ use std::rc::Rc;
 use types::{color::Color, ray::Ray, vector::Point3, vector::Vec3,hittable::{HitRecord},hittable_list::HittableList, rtweekend::{random_in_unit_sphere, random_in_hemisphere}};
 use rand::prelude::*;
 use objects::sphere::Sphere;
-use crate::{types::{hittable::Hittable, camera::Camera}, materials::{lambertian::Lambertian, metal::Metal, dielectric::Dielectric}};
+use crate::{types::{hittable::Hittable, camera::Camera, rtweekend::PI}, materials::{lambertian::Lambertian, metal::Metal, dielectric::Dielectric}};
 use crate::types::rtweekend::INFINITY;
 
 const ASPECT_RATIO:f32 = 16.0 / 9.0;
@@ -15,10 +15,13 @@ const IMAGE_WIDTH:u32 = 500;
 const IMAGE_HEIGHT:u32 = (IMAGE_WIDTH as f32 / ASPECT_RATIO) as u32;
 const SAMPLES_PER_PIXEL:u8 = 100;
 const MAX_DEPTH:i8=50;
+const CAMERA_POS:Point3 = Point3{x:-2.0,y:2.0,z:1.0};
+const CAMERA_FOCUS:Point3 = Point3{x:0.0,y:0.0,z:-1.0};
 
 fn main() {
 
     // let mut world:HittableList<dyn Hittable>=HittableList::default();
+    let R = (PI/4.0).cos();
     let mut world = HittableList::default();
 
     let material_ground = Rc::new(Lambertian {albedo: Color::new(0.8,0.8,0.0)});
@@ -40,7 +43,7 @@ fn main() {
     eprintln!("Start");
 
 
-    let camera=Camera::new();
+    let camera=Camera::new(CAMERA_POS,CAMERA_FOCUS,Vec3::new(0.0,1.0,0.0),20.0,ASPECT_RATIO);
 
     let mut rng = rand::thread_rng();
 
