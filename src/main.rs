@@ -7,11 +7,11 @@ use std::rc::Rc;
 use types::{color::Color, ray::Ray, vector::Point3, vector::Vec3,hittable::{HitRecord},hittable_list::HittableList, rtweekend::{random_in_unit_sphere, random_in_hemisphere}};
 use rand::prelude::*;
 use objects::sphere::Sphere;
-use crate::{types::{hittable::Hittable, camera::Camera}, materials::{lambertian::Lambertian, metal::Metal}};
+use crate::{types::{hittable::Hittable, camera::Camera}, materials::{lambertian::Lambertian, metal::Metal, dielectric::Dielectric}};
 use crate::types::rtweekend::INFINITY;
 
 const ASPECT_RATIO:f32 = 16.0 / 9.0;
-const IMAGE_WIDTH:u32 = 1920;
+const IMAGE_WIDTH:u32 = 500;
 const IMAGE_HEIGHT:u32 = (IMAGE_WIDTH as f32 / ASPECT_RATIO) as u32;
 const SAMPLES_PER_PIXEL:u8 = 100;
 const MAX_DEPTH:i8=50;
@@ -22,8 +22,8 @@ fn main() {
     let mut world = HittableList::default();
 
     let material_ground = Rc::new(Lambertian {albedo: Color::new(0.8,0.8,0.0)});
-    let material_center = Rc::new(Lambertian {albedo: Color::new(0.7,0.3,0.3)});
-    let material_left   = Rc::new(Metal {albedo:Color::new(0.8, 0.8, 0.8),fuzz:0.3 });
+    let material_center = Rc::new(Lambertian {albedo: Color::new(0.1,0.2,0.5)});
+    let material_left   = Rc::new(Dielectric{ ir: 1.5 });
     let material_right  = Rc::new(Metal {albedo:Color::new(0.8, 0.6, 0.2),fuzz:1.0});
 
     let copy = Rc::clone(&material_ground);
@@ -50,8 +50,8 @@ fn main() {
 
     eprintln!("{} {} {}", IMAGE_HEIGHT, IMAGE_WIDTH, ASPECT_RATIO);
 
-    for j in (0..IMAGE_HEIGHT).rev() {
-        for i in 0..IMAGE_WIDTH {
+    for j in (0..IMAGE_HEIGHT).rev(){
+        for i in 0..IMAGE_WIDTH  {
             // eprintln!("\rScanlines remaining: {} ", j);
             let mut pixel_color=Color::default();
             for _s in 0..SAMPLES_PER_PIXEL{
