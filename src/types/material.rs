@@ -1,5 +1,11 @@
-use super::{ray::Ray, hittable::HitRecord, color::Color};
+use super::{color::Color, hittable::HitRecord, ray::Ray};
 
-pub trait Material{
-    fn scatter(&self,r_in:&Ray, rec:&HitRecord,attenuation:&mut Color,scattered:&mut Ray)->bool;
+pub trait Material {
+    fn scatter(
+        &self,
+        r_in: &Ray,
+        rec: &HitRecord,
+        attenuation: &mut Color,
+        scattered: &mut Ray,
+    ) -> bool;
 }

@@ -7,7 +7,7 @@ use crate::types::vector::Point3;
 pub struct Sphere {
     pub center: Point3,
     pub radius: f32,
-    pub mat_ptr:Rc<dyn Material>
+    pub mat_ptr: Rc<dyn Material>,
 }
 
 impl Hittable for Sphere {
@@ -42,7 +42,7 @@ impl Hittable for Sphere {
         let normal = (rec.p - self.center) / self.radius;
         rec.set_face_normal(&r, normal);
         rec.mat_ptr = Rc::clone(&self.mat_ptr);
-        
+
         true
     }
 }

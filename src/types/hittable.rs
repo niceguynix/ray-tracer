@@ -3,15 +3,16 @@ use std::rc::Rc;
 use crate::materials::lambertian::Lambertian;
 
 use super::{
+    color::Color,
+    material::Material,
     ray::Ray,
     vector::{Point3, Vec3},
-    material::Material, color::Color,
 };
 
 pub struct HitRecord {
     pub p: Point3,
     pub normal: Vec3,
-    pub mat_ptr:Rc<dyn Material>,
+    pub mat_ptr: Rc<dyn Material>,
     pub t: f32,
     pub front_face: bool,
 }
@@ -32,7 +33,9 @@ impl HitRecord {
         HitRecord {
             p: Vec3::default(),
             normal: Vec3::default(),
-            mat_ptr:Rc::new(Lambertian{albedo:Color::new(1.0,1.0,1.0)}),
+            mat_ptr: Rc::new(Lambertian {
+                albedo: Color::new(1.0, 1.0, 1.0),
+            }),
             t: 0.0,
             front_face: true,
         }

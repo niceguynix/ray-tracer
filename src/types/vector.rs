@@ -1,6 +1,6 @@
 use std::ops;
 
-use rand::{Rng, distributions::Uniform, prelude::Distribution};
+use rand::{distributions::Uniform, prelude::Distribution, Rng};
 
 #[derive(Clone, Copy)]
 pub struct Vec3 {
@@ -172,29 +172,32 @@ impl Vec3 {
         self / len
     }
 
-    pub fn random()->Self{
-        let mut rng=rand::thread_rng();
-        return Vec3 { x: rng.gen_range(0.0..1.0), y: rng.gen_range(0.0..1.0), z: rng.gen_range(0.0..1.0) }
+    pub fn random() -> Self {
+        let mut rng = rand::thread_rng();
+        return Vec3 {
+            x: rng.gen_range(0.0..1.0),
+            y: rng.gen_range(0.0..1.0),
+            z: rng.gen_range(0.0..1.0),
+        };
     }
 
-    pub fn random_range(min:f32,max:f32)->Self{
-        let mut rng=rand::thread_rng();
-        let x=rng.gen_range(min..max);
-        let y=rng.gen_range(min..max);
-        let z=rng.gen_range(min..max);
-        
-        return Vec3 { x , y, z }
+    pub fn random_range(min: f32, max: f32) -> Self {
+        let mut rng = rand::thread_rng();
+        let x = rng.gen_range(min..max);
+        let y = rng.gen_range(min..max);
+        let z = rng.gen_range(min..max);
+
+        return Vec3 { x, y, z };
     }
 
-    pub fn near_zero(&self)->bool{
-        let s=1e-8;
+    pub fn near_zero(&self) -> bool {
+        let s = 1e-8;
         f32::abs(self.x) < s && f32::abs(self.y) < s && f32::abs(self.z) < s
     }
 
-    pub fn reflect(v:&Vec3,n:&Vec3)->Vec3{
-        *v - 2.0*v.dot(n)* *n
+    pub fn reflect(v: &Vec3, n: &Vec3) -> Vec3 {
+        *v - 2.0 * v.dot(n) * *n
     }
-
 }
 
 pub type Point3 = Vec3;

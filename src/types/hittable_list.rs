@@ -42,7 +42,7 @@ impl Hittable for HittableList {
                 rec.p = temp_rec.p;
                 rec.t = temp_rec.t;
                 rec.set_face_normal(&r, temp_rec.normal);
-                rec.mat_ptr=Rc::clone(&temp_rec.mat_ptr);
+                rec.mat_ptr = Rc::clone(&temp_rec.mat_ptr);
             }
         }
         hit_anything
